@@ -5,7 +5,7 @@ export async function htmlToPdf(htmlPath: string, pdfPath: string) {
   const browser = await puppeteer.launch();
   const page = await browser.newPage();
   const htmlContent = fs.readFileSync(htmlPath, 'utf-8');
-  await page.setContent(htmlContent, { waitUntil: 'networkidle0' });
+  await page.setContent(htmlContent, { waitUntil: 'load' });
   await page.pdf({
     path: pdfPath,
     format: 'A4',

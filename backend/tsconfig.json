@@ -10,15 +10,15 @@
     "sourceMap": true,
     "rootDir": "./src",
     "outDir": "./dist",
-    "incremental": true,
     "skipLibCheck": true,
     "strictNullChecks": false,
     "noImplicitAny": false,
     "strictBindCallApply": false,
     "forceConsistentCasingInFileNames": false,
     "noFallthroughCasesInSwitch": false,
-    "baseUrl": "./src",
     "types": ["node", "jest"],
-    "ignoreDeprecations": "6.0"
+    "baseUrl": "./src",
+    "paths": {},
+    "incremental": false
   }
 }
