@@ -133,6 +133,7 @@ export default function RoomManagementPage() {
         <Space size="middle">
           <Tooltip title="Edit">
             <Button
+              data-testid={`edit-room-button-${record.id}`}
               shape="circle"
               icon={<EditOutlined />}
               onClick={() => {
@@ -152,6 +153,7 @@ export default function RoomManagementPage() {
 
           <Tooltip title="Delete">
             <Button
+              data-testid={`delete-room-button-${record.id}`}
               shape="circle"
               icon={<DeleteOutlined />}
               onClick={() =>
@@ -330,7 +332,7 @@ export default function RoomManagementPage() {
     <div className="p-4">
       <div className="flex justify-between items-center">
         <div>
-          <Button type="primary" icon={<PlusOutlined />} onClick={() => setOpenCreateRoomModal(true)}>
+          <Button data-testid="create-room-button" type="primary" icon={<PlusOutlined />} onClick={() => setOpenCreateRoomModal(true)}>
             Create
           </Button>
         </div>
@@ -441,15 +443,16 @@ export default function RoomManagementPage() {
         >
           <Form layout="vertical" form={createRoomForm} name="control-hooks" style={{ marginTop: 16 }}>
             <Form.Item name="roomNumber" label="Room number" rules={[{ required: true }]}>
-              <Input disabled={isCreatingRoom} />
+              <Input data-testid="creating-room-number-input" disabled={isCreatingRoom} />
             </Form.Item>
 
             <Form.Item name="maxPeople" label="Max Peple" rules={[{ required: true }]}>
-              <InputNumber addonAfter="Người" min={1} step={1} style={{ width: '100%' }} disabled={isCreatingRoom} />
+              <InputNumber data-testid="creating-room-max-people-input" addonAfter="Người" min={1} step={1} style={{ width: '100%' }} disabled={isCreatingRoom} />
             </Form.Item>
 
             <Form.Item name="typeId" label="Room type" rules={[{ required: true }]}>
               <Select
+                data-testid="creating-room-type-select"
                 showSearch
                 placeholder="Select a room type..."
                 optionFilterProp="label"
@@ -467,6 +470,7 @@ export default function RoomManagementPage() {
 
             <Form.Item name="price" label="Price" rules={[{ required: true }]}>
               <InputNumber
+                data-testid="creating-room-price-input"
                 addonAfter="$"
                 min={0.0}
                 step={0.01}
@@ -506,7 +510,7 @@ export default function RoomManagementPage() {
             >
               Reset
             </Button>,
-            <Button key="submit" type="primary" loading={isUpdatingRoom} onClick={handleUpdateRoomSubmit}>
+            <Button key="submit" data-testid="update-room-submit-button" type="primary" loading={isUpdatingRoom} onClick={handleUpdateRoomSubmit}>
               Submit
             </Button>,
           ]}
@@ -540,6 +544,7 @@ export default function RoomManagementPage() {
 
             <Form.Item name="price" label="Price" rules={[{ required: true }]}>
               <InputNumber
+                data-testid="updating-room-price-input"
                 addonAfter="$"
                 min={0.0}
                 step={0.01}

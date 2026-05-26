@@ -206,7 +206,7 @@ const RoomPage = () => {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   {rooms.map((room, index) => (
                     <motion.div key={room.id} {...fadeInUp} transition={{ delay: index * 0.2 }}>
-                      <Card className="flex flex-col overflow-hidden hover:shadow-xl transition-all duration-300 group h-full bg-white">
+                      <Card data-testid="room-card" className="flex flex-col overflow-hidden hover:shadow-xl transition-all duration-300 group h-full bg-white">
                         <div className="relative">
                           <img
                             src={`${baseUrl}/${room.media[0]?.path || 'placeholder.svg'}`}
@@ -228,7 +228,7 @@ const RoomPage = () => {
                         </div>
 
                         <CardContent className="p-4 flex-1 flex flex-col">
-                          <h3 className="text-xl font-bold text-gray-800 mb-3">
+                          <h3 data-testid="room-name" className="text-xl font-bold text-gray-800 mb-3">
                             {room.type.name} - Room {room.roomNumber}
                           </h3>
                           <div
@@ -244,7 +244,7 @@ const RoomPage = () => {
                           </div>
 
                           <div className="text-2xl font-bold text-teal-600 mb-4 flex justify-between items-center">
-                            <span>
+                            <span data-testid="room-price">
                               {formatCurrencyUSD(room.price)}/day
                             </span>
                             <div>
@@ -270,6 +270,7 @@ const RoomPage = () => {
                               View Details
                             </Button>
                             <Button
+                              data-testid="book-room-button"
                               size="sm"
                               className="flex-1 bg-teal-600 hover:bg-teal-700"
                               onClick={() => {

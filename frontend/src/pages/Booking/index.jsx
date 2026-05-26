@@ -257,7 +257,7 @@ export default function BookingConfirmationPage() {
                   <CalendarIcon className="w-5 h-5 text-gray-500" />
                   <span className="font-semibold">Check-out:</span> {formatDateVN(dateRange[1])}
                 </p>
-                <p className="flex items-center gap-2">
+                <p className="flex items-center gap-2" data-testid="booking-total-days">
                   <span className="font-semibold ml-7">{numberOfDays} days</span>
                 </p>
                 <p className="flex items-center gap-2">
@@ -278,7 +278,7 @@ export default function BookingConfirmationPage() {
                     Number of people
                   </Label>
                   <Select value={guests} onValueChange={setGuests}>
-                    <SelectTrigger className="mt-1">
+                    <SelectTrigger className="mt-1" data-testid="booking-guests-select">
                       <SelectValue placeholder="Select number of guests" />
                     </SelectTrigger>
                     <SelectContent>
@@ -297,6 +297,7 @@ export default function BookingConfirmationPage() {
                     Check-in Date
                   </Label>
                   <Input
+                    data-testid="booking-checkin-input"
                     id="checkin"
                     type="date"
                     value={dateRange[0] || ''}
@@ -333,6 +334,7 @@ export default function BookingConfirmationPage() {
                     Check-out Date
                   </Label>
                   <Input
+                    data-testid="booking-checkout-input"
                     id="checkout"
                     type="date"
                     value={dateRange[1] || ''}
@@ -378,7 +380,7 @@ export default function BookingConfirmationPage() {
                 <div className="space-y-2">
                   <div className="flex justify-between font-bold border-t pt-2 mt-2">
                     <span>Total Amount:</span>
-                    <span>${calculateRoomTotal}</span>
+                    <span data-testid="booking-total-price">${calculateRoomTotal}</span>
                   </div>
                 </div>
               </div>
@@ -386,6 +388,7 @@ export default function BookingConfirmationPage() {
 
             <div className="mt-8 flex flex-col sm:flex-row gap-4">
               <Button
+                data-testid="confirm-booking-button"
                 onClick={handleConfirmBooking}
                 disabled={!(dateRange[0] && dateRange[1]) || error}
                 className="flex-1 bg-teal-600 hover:bg-teal-700 text-white text-lg py-3"
@@ -439,7 +442,7 @@ export default function BookingConfirmationPage() {
             ) : (
               <XCircle className="w-16 h-16 text-red-500 mx-auto mb-4" />
             )}
-            <DialogTitle className="text-2xl font-bold">
+            <DialogTitle data-testid="booking-success-title" className="text-2xl font-bold">
               {isBookingSuccessful ? 'Booking Confirmed!' : 'Booking Failed'}
             </DialogTitle>
             <DialogDescription className="text-gray-600">{bookingMessage}</DialogDescription>
@@ -457,6 +460,7 @@ export default function BookingConfirmationPage() {
                   Go to Services
                 </Button>
                 <Button
+                  data-testid={`go-to-contract-button`}
                   className="bg-teal-600 hover:bg-teal-700"
                   onClick={() => {
                     navigate('/contracts');

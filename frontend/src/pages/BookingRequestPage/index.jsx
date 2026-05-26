@@ -190,6 +190,7 @@ export default function BookingRequestPage() {
 
           <Tooltip title="Create contract">
             <Button
+              data-testid={`create-contract-button`}
               shape="circle"
               icon={<FileAddOutlined />}
               onClick={() =>
@@ -234,6 +235,7 @@ export default function BookingRequestPage() {
 
           <Tooltip title="Reject booking">
             <Button
+              data-testid={`reject-booking-button`}
               shape="circle"
               icon={<CloseCircleOutlined />}
               onClick={() => setSelectedRowToReject(record)}
@@ -1028,6 +1030,7 @@ export default function BookingRequestPage() {
 
         {/* Reason For Rejection Modal */}
         <Modal
+          data-testid={`reason-for-rejection-modal`}
           title="Reason For Rejection"
           open={isOpenReasonOfRejectionModal}
           onCancel={() => setOpenReasonOfRejectionModal(false)}
@@ -1036,7 +1039,7 @@ export default function BookingRequestPage() {
             <Button key="back" onClick={() => setOpenContractPreviewModal(false)}>
               Cancel
             </Button>,
-            <Button key="submit" type="primary" onClick={handleRejectBookingSubmit} loading={isRejectingBooking}>
+            <Button data-testid={`reject-booking-submit`} key="submit" type="primary" onClick={handleRejectBookingSubmit} loading={isRejectingBooking}>
               Submit
             </Button>,
           ]}
@@ -1048,6 +1051,7 @@ export default function BookingRequestPage() {
 
             <Form.Item name="reasonForRejection" label="Reason For Rejection" rules={[{ required: true }]}>
               <TextEditor
+                data-testid={`reject-reason-editor`}
                 disabled={isRejectingBooking}
                 initialValue={rejectBookingForm.getFieldValue('reasonForRejection')}
               />
