@@ -13,7 +13,7 @@ async function bootstrap() {
   app.useGlobalPipes(new ValidationPipe());
   app.useGlobalFilters(new HttpExceptionFilter())
   app.enableCors({
-    origin: process.env.FRONTEND_HOST,
+    origin: [process.env.FRONTEND_HOST, /^http:\/\/localhost:\d+$/],
     credentials: true,
   });
   await app.listen(process.env.PORT);
