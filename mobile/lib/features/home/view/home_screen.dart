@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:mobile/features/auth/models/auth_model.dart';
+import 'package:mobile/features/room/view/room_list_screen.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key, this.session});
@@ -115,7 +116,12 @@ class HomeScreen extends StatelessWidget {
             _DrawerNavItem(
               icon: Icons.king_bed_outlined,
               title: 'Rooms',
-              onTap: () => debugPrint('Navigate to Rooms'),
+              onTap: () {
+                Navigator.of(context).pop();
+                Navigator.of(context).push(
+                  MaterialPageRoute(builder: (_) => const RoomListScreen()),
+                );
+              },
             ),
             _DrawerNavItem(
               icon: Icons.room_service_outlined,
