@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:mobile/features/room/models/room_model.dart';
 import 'package:mobile/features/room/repository/room_repository.dart';
+import 'package:mobile/features/room/view/room_detail_screen.dart';
 import 'package:mobile/features/room/view/widgets/room_card.dart';
 import 'package:mobile/features/room/view/widgets/room_filter_card.dart';
 
@@ -132,20 +133,16 @@ class _RoomListScreenState extends State<RoomListScreen> {
                           return RoomCard(
                             room: room,
                             onViewDetails: () {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(
-                                  content: Text(
-                                    'Viewing details for room ${room.roomNumber}',
-                                  ),
+                              Navigator.of(context).push(
+                                MaterialPageRoute(
+                                  builder: (_) => RoomDetailScreen(room: room),
                                 ),
                               );
                             },
                             onBookRoom: () {
                               ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(
-                                  content: Text(
-                                    'Booking room ${room.roomNumber}',
-                                  ),
+                                const SnackBar(
+                                  content: Text('Booking feature is currently unavailable.'),
                                 ),
                               );
                             },
