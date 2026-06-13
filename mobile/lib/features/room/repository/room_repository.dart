@@ -54,6 +54,26 @@ class RoomRepository {
     }
   }
 
+  Future<List<RoomTypeModel>> getRoomTypes() async {
+    try {
+      final response = await _apiClient.get('/room/type');
+      final payload = response.data;
+      if (payload is! Map<String, dynamic>) return [];
+      final data = payload['data'];
+      List raw = [];
+      if (data is List) {
+        raw = data.isNotEmpty && data[0] is List ? data[0] as List : data;
+      } else if (data is Map<String, dynamic>) {
+        raw = data['items'] is List ? data['items'] as List : [];
+      }
+      return raw.whereType<Map>()
+          .map((e) => RoomTypeModel.fromJson(Map<String, dynamic>.from(e)))
+          .toList();
+    } catch (_) {
+      return [];
+    }
+  }
+
   String? _extractErrorMessage(dynamic responseData) {
     if (responseData is! Map<String, dynamic>) {
       return null;

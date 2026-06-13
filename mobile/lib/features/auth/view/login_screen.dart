@@ -1,18 +1,20 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:go_router/go_router.dart';
+import 'package:mobile/core/providers/auth_provider.dart';
 import 'package:mobile/features/auth/models/auth_model.dart';
 import 'package:mobile/features/auth/repository/auth_repository.dart';
-import 'package:mobile/features/home/view/home_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-class LoginScreen extends StatefulWidget {
+class LoginScreen extends ConsumerStatefulWidget {
   const LoginScreen({super.key});
 
   @override
-  State<LoginScreen> createState() => _LoginScreenState();
+  ConsumerState<LoginScreen> createState() => _LoginScreenState();
 }
 
-class _LoginScreenState extends State<LoginScreen> {
+class _LoginScreenState extends ConsumerState<LoginScreen> {
   final _formKey = GlobalKey<FormState>();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
@@ -33,101 +35,59 @@ class _LoginScreenState extends State<LoginScreen> {
     _loadSavedCredentials();
   }
 
+  @override
+  void dispose() {
+    _emailController.dispose();
+    _passwordController.dispose();
+    super.dispose();
+  }
+
   Future<void> _loadSavedCredentials() async {
     final prefs = await SharedPreferences.getInstance();
     final rememberedEmail = prefs.getString('remembered_email');
-    final rememberedPassword = await _secureStorage.read(
-      key: 'remembered_password',
-    );
-
-    if (!mounted) {
-      return;
-    }
-
+    final rememberedPassword = await _secureStorage.read(key: 'remembered_password');
+    if (!mounted) return;
     setState(() {
       _rememberMe = rememberedEmail != null && rememberedPassword != null;
-      if (rememberedEmail != null) {
-        _emailController.text = rememberedEmail;
-      }
-      if (rememberedPassword != null) {
-        _passwordController.text = rememberedPassword;
-      }
+      if (rememberedEmail != null) _emailController.text = rememberedEmail;
+      if (rememberedPassword != null) _passwordController.text = rememberedPassword;
     });
   }
 
   Future<void> _handleLogin() async {
-    if (!_formKey.currentState!.validate()) {
-      return;
-    }
-
+    if (!_formKey.currentState!.validate()) return;
     setState(() {
       _isLoading = true;
       _errorMessage = null;
     });
 
     try {
-      final session = await _authRepository.signIn(
+      await _authRepository.signIn(
         email: _emailController.text,
         password: _passwordController.text,
       );
 
       final prefs = await SharedPreferences.getInstance();
-
       if (_rememberMe) {
         await prefs.setString('remembered_email', _emailController.text.trim());
-        await _secureStorage.write(
-          key: 'remembered_password',
-          value: _passwordController.text,
-        );
+        await _secureStorage.write(key: 'remembered_password', value: _passwordController.text);
       } else {
         await prefs.remove('remembered_email');
         await _secureStorage.delete(key: 'remembered_password');
       }
 
-      if (!mounted) {
-        return;
-      }
-
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: const Text('Signed in successfully.'),
-          backgroundColor: _brandGreen,
-        ),
-      );
-
-      Navigator.of(context).pushReplacement(
-        MaterialPageRoute(builder: (_) => HomeScreen(session: session)),
-      );
-    } on AuthException catch (error) {
-      if (!mounted) {
-        return;
-      }
-      setState(() {
-        _errorMessage = error.message;
-      });
-    } catch (error) {
-      if (!mounted) {
-        return;
-      }
-      setState(() {
-        _errorMessage = 'Unexpected error. Please try again.';
-      });
+      if (!mounted) return;
+      await ref.read(authProvider.notifier).setLoggedIn(true);
+      // GoRouter redirect will handle navigation to /home
+    } on AuthException catch (e) {
+      if (!mounted) return;
+      setState(() => _errorMessage = e.message);
+    } catch (_) {
+      if (!mounted) return;
+      setState(() => _errorMessage = 'Unexpected error. Please try again.');
     } finally {
-      if (mounted) {
-        setState(() {
-          _isLoading = false;
-        });
-      }
+      if (mounted) setState(() => _isLoading = false);
     }
-  }
-
-  void _showFeatureComingSoon(String featureName) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text('$featureName is coming soon.'),
-        backgroundColor: const Color(0xFF0D584D),
-      ),
-    );
   }
 
   @override
@@ -149,7 +109,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 children: [
                   const SizedBox(height: 20),
                   Container(
-                    width: 320,
+                    width: 360,
                     padding: const EdgeInsets.all(24),
                     decoration: BoxDecoration(
                       color: Colors.white.withValues(alpha: 0.96),
@@ -174,11 +134,7 @@ class _LoginScreenState extends State<LoginScreen> {
                               color: _brandGreen.withValues(alpha: 0.12),
                               borderRadius: BorderRadius.circular(16),
                             ),
-                            child: const Icon(
-                              Icons.hotel,
-                              color: _brandGreen,
-                              size: 28,
-                            ),
+                            child: const Icon(Icons.hotel, color: _brandGreen, size: 28),
                           ),
                           const SizedBox(height: 16),
                           const Text(
@@ -192,43 +148,16 @@ class _LoginScreenState extends State<LoginScreen> {
                           const SizedBox(height: 8),
                           const Text(
                             'Sign in to continue your retreat with us.',
-                            style: TextStyle(
-                              color: Color(0xFF6A7A82),
-                              fontSize: 14,
-                            ),
+                            style: TextStyle(color: Color(0xFF6A7A82), fontSize: 14),
                           ),
                           const SizedBox(height: 24),
                           TextFormField(
                             controller: _emailController,
                             keyboardType: TextInputType.emailAddress,
-                            autofillHints: const [AutofillHints.email],
-                            decoration: InputDecoration(
-                              labelText: 'Email',
-                              prefixIcon: const Icon(Icons.email_outlined),
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(14),
-                              ),
-                              enabledBorder: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(14),
-                                borderSide: const BorderSide(
-                                  color: Color(0xFFCBD5E1),
-                                ),
-                              ),
-                              focusedBorder: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(14),
-                                borderSide: const BorderSide(
-                                  color: _brandGreen,
-                                  width: 2,
-                                ),
-                              ),
-                            ),
-                            validator: (value) {
-                              if (value == null || value.trim().isEmpty) {
-                                return 'Please enter your email.';
-                              }
-                              if (!RegExp(
-                                r'^.+@.+\..+$',
-                              ).hasMatch(value.trim())) {
+                            decoration: _inputDecoration('Email', Icons.email_outlined),
+                            validator: (v) {
+                              if (v == null || v.trim().isEmpty) return 'Please enter your email.';
+                              if (!RegExp(r'^.+@.+\..+$').hasMatch(v.trim())) {
                                 return 'Please enter a valid email address.';
                               }
                               return null;
@@ -238,41 +167,19 @@ class _LoginScreenState extends State<LoginScreen> {
                           TextFormField(
                             controller: _passwordController,
                             obscureText: _obscurePassword,
-                            autofillHints: const [AutofillHints.password],
-                            decoration: InputDecoration(
-                              labelText: 'Password',
-                              prefixIcon: const Icon(Icons.lock_outline),
+                            decoration: _inputDecoration(
+                              'Password',
+                              Icons.lock_outline,
                               suffixIcon: IconButton(
-                                icon: Icon(
-                                  _obscurePassword
-                                      ? Icons.visibility_off_outlined
-                                      : Icons.visibility_outlined,
-                                ),
-                                onPressed: () => setState(
-                                  () => _obscurePassword = !_obscurePassword,
-                                ),
-                              ),
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(14),
-                              ),
-                              enabledBorder: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(14),
-                                borderSide: const BorderSide(
-                                  color: Color(0xFFCBD5E1),
-                                ),
-                              ),
-                              focusedBorder: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(14),
-                                borderSide: const BorderSide(
-                                  color: _brandGreen,
-                                  width: 2,
-                                ),
+                                icon: Icon(_obscurePassword
+                                    ? Icons.visibility_off_outlined
+                                    : Icons.visibility_outlined),
+                                onPressed: () =>
+                                    setState(() => _obscurePassword = !_obscurePassword),
                               ),
                             ),
-                            validator: (value) {
-                              if (value == null || value.isEmpty) {
-                                return 'Please enter your password.';
-                              }
+                            validator: (v) {
+                              if (v == null || v.isEmpty) return 'Please enter your password.';
                               return null;
                             },
                           ),
@@ -282,20 +189,11 @@ class _LoginScreenState extends State<LoginScreen> {
                               Checkbox(
                                 value: _rememberMe,
                                 activeColor: _brandGreen,
-                                onChanged: (value) {
-                                  setState(() {
-                                    _rememberMe = value ?? false;
-                                  });
-                                },
+                                onChanged: (v) => setState(() => _rememberMe = v ?? false),
                               ),
-                              const Expanded(
-                                child: Text(
-                                  'Remember me',
-                                  style: TextStyle(
-                                    fontSize: 13,
-                                    color: Color(0xFF485A66),
-                                  ),
-                                ),
+                              const Text(
+                                'Remember me',
+                                style: TextStyle(fontSize: 13, color: Color(0xFF485A66)),
                               ),
                             ],
                           ),
@@ -303,21 +201,15 @@ class _LoginScreenState extends State<LoginScreen> {
                             const SizedBox(height: 8),
                             Container(
                               width: double.infinity,
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 12,
-                                vertical: 10,
-                              ),
+                              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
                               decoration: BoxDecoration(
                                 color: const Color(0xFFFFF1F2),
                                 borderRadius: BorderRadius.circular(10),
-                                border: Border.all(color: Color(0xFFFDA4AF)),
+                                border: Border.all(color: const Color(0xFFFDA4AF)),
                               ),
                               child: Text(
                                 _errorMessage!,
-                                style: const TextStyle(
-                                  color: Color(0xFFB91C1C),
-                                  fontSize: 12,
-                                ),
+                                style: const TextStyle(color: Color(0xFFB91C1C), fontSize: 12),
                               ),
                             ),
                           ],
@@ -329,9 +221,7 @@ class _LoginScreenState extends State<LoginScreen> {
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: _brandGreen,
                                 foregroundColor: Colors.white,
-                                padding: const EdgeInsets.symmetric(
-                                  vertical: 16,
-                                ),
+                                padding: const EdgeInsets.symmetric(vertical: 16),
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(14),
                                 ),
@@ -342,18 +232,12 @@ class _LoginScreenState extends State<LoginScreen> {
                                       width: 20,
                                       child: CircularProgressIndicator(
                                         strokeWidth: 2,
-                                        valueColor:
-                                            AlwaysStoppedAnimation<Color>(
-                                              Colors.white,
-                                            ),
+                                        valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
                                       ),
                                     )
                                   : const Text(
                                       'Log In',
-                                      style: TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                        fontSize: 15,
-                                      ),
+                                      style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
                                     ),
                             ),
                           ),
@@ -362,19 +246,14 @@ class _LoginScreenState extends State<LoginScreen> {
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               TextButton(
-                                onPressed: () =>
-                                    _showFeatureComingSoon('Password reset'),
+                                onPressed: () => context.push('/forgot-password'),
                                 child: const Text(
                                   'Forgot password?',
-                                  style: TextStyle(
-                                    color: _brandGreen,
-                                    fontWeight: FontWeight.w600,
-                                  ),
+                                  style: TextStyle(color: _brandGreen, fontWeight: FontWeight.w600),
                                 ),
                               ),
                               TextButton(
-                                onPressed: () =>
-                                    _showFeatureComingSoon('Sign up'),
+                                onPressed: () => context.push('/signup'),
                                 child: const Text(
                                   'Sign Up',
                                   style: TextStyle(
@@ -394,6 +273,23 @@ class _LoginScreenState extends State<LoginScreen> {
             ),
           ),
         ),
+      ),
+    );
+  }
+
+  InputDecoration _inputDecoration(String label, IconData icon, {Widget? suffixIcon}) {
+    return InputDecoration(
+      labelText: label,
+      prefixIcon: Icon(icon),
+      suffixIcon: suffixIcon,
+      border: OutlineInputBorder(borderRadius: BorderRadius.circular(14)),
+      enabledBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(14),
+        borderSide: const BorderSide(color: Color(0xFFCBD5E1)),
+      ),
+      focusedBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(14),
+        borderSide: const BorderSide(color: _brandGreen, width: 2),
       ),
     );
   }
