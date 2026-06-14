@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:mobile/core/network/api_client.dart';
 import 'package:mobile/features/booking/view/booking_confirmation_screen.dart';
 import 'package:mobile/features/room/models/room_model.dart';
 import 'package:mobile/features/room/repository/room_repository.dart';
@@ -25,6 +26,8 @@ class _RoomListScreenState extends State<RoomListScreen> {
   bool _isLoading = false;
   String? _errorMessage;
   bool _showFilter = false;
+  // roomId → favoriteId (for initial heart state on each card)
+  Map<int, int> _favoritesMap = {};
 
   @override
   void initState() {
@@ -32,6 +35,33 @@ class _RoomListScreenState extends State<RoomListScreen> {
     _filters = const GetRoomsRequest(page: 1, limit: _pageSize);
     _loadRooms();
     _loadRoomTypes();
+    _loadFavorites();
+  }
+
+  Future<void> _loadFavorites() async {
+    try {
+      final res = await ApiClient().get('/user/favorite-room', queryParameters: {'page': 1, 'limit': 100});
+      final payload = res.data;
+      if (payload is! Map<String, dynamic>) return;
+      final data = payload['data'];
+      List raw = [];
+      if (data is List) {
+        raw = data.isNotEmpty && data[0] is List ? data[0] as List : data;
+      } else if (data is Map<String, dynamic>) {
+        raw = data['items'] is List ? data['items'] as List : [];
+      }
+      final map = <int, int>{};
+      for (final item in raw) {
+        if (item is! Map) continue;
+        final favId = _parseIntVal(item['id']);
+        final room = item['room'];
+        if (room is Map) {
+          final roomId = _parseIntVal(room['id']);
+          if (roomId > 0 && favId > 0) map[roomId] = favId;
+        }
+      }
+      if (mounted) setState(() => _favoritesMap = map);
+    } catch (_) {}
   }
 
   Future<void> _loadRoomTypes() async {
@@ -187,6 +217,8 @@ class _RoomListScreenState extends State<RoomListScreen> {
                                 final room = rooms[index];
                                 return RoomCard(
                                   room: room,
+                                  initialIsFavorite: _favoritesMap.containsKey(room.id),
+                                  initialFavoriteId: _favoritesMap[room.id],
                                   onViewDetails: () => Navigator.push(context,
                                       MaterialPageRoute(builder: (_) => RoomDetailScreen(room: room))),
                                   onBookRoom: () => Navigator.push(context,
@@ -228,6 +260,13 @@ class _RoomListScreenState extends State<RoomListScreen> {
       ),
     );
   }
+}
+
+int _parseIntVal(dynamic v) {
+  if (v is int) return v;
+  if (v is double) return v.toInt();
+  if (v is String) return int.tryParse(v) ?? 0;
+  return 0;
 }
 
 class _ErrorState extends StatelessWidget {

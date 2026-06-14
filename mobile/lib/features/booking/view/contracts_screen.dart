@@ -237,12 +237,12 @@ class _BookingDetailSheetState extends State<_BookingDetailSheet> {
   Future<void> _cancel() async {
     final ok = await showDialog<bool>(
       context: context,
-      builder: (_) => AlertDialog(
+      builder: (dialogCtx) => AlertDialog(
         title: const Text('Huỷ đặt phòng'),
         content: const Text('Bạn có chắc muốn huỷ booking này không?'),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('Không')),
-          TextButton(onPressed: () => Navigator.pop(context, true), child: const Text('Huỷ', style: TextStyle(color: Colors.red))),
+          TextButton(onPressed: () => Navigator.pop(dialogCtx, false), child: const Text('Không')),
+          TextButton(onPressed: () => Navigator.pop(dialogCtx, true), child: const Text('Huỷ', style: TextStyle(color: Colors.red))),
         ],
       ),
     );

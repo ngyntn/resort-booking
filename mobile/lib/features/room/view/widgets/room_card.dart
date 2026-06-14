@@ -8,11 +8,15 @@ class RoomCard extends StatefulWidget {
     required this.room,
     required this.onViewDetails,
     required this.onBookRoom,
+    this.initialIsFavorite = false,
+    this.initialFavoriteId,
   });
 
   final RoomModel room;
   final VoidCallback onViewDetails;
   final VoidCallback onBookRoom;
+  final bool initialIsFavorite;
+  final int? initialFavoriteId;
 
   @override
   State<RoomCard> createState() => _RoomCardState();
@@ -20,9 +24,16 @@ class RoomCard extends StatefulWidget {
 
 class _RoomCardState extends State<RoomCard> {
   final _api = ApiClient();
-  bool _isFavorite = false;
-  int? _favoriteId;
+  late bool _isFavorite;
+  late int? _favoriteId;
   bool _toggling = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _isFavorite = widget.initialIsFavorite;
+    _favoriteId = widget.initialFavoriteId;
+  }
 
   String get _imageUrl {
     if (widget.room.media.isNotEmpty && widget.room.media.first.path.isNotEmpty) {

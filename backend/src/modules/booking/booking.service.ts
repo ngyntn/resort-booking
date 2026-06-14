@@ -682,6 +682,10 @@ export class BookingService {
           contractUrl: path.join('uploads', `${fileName}.pdf`),
         });
         const newContract = await queryRunner.manager.save(contractEntity);
+
+        // Cập nhật trạng thái booking thành confirmed (admin đã chấp nhận)
+        await queryRunner.manager.update(Booking, { id: bookingId }, { status: 'confirmed' });
+
         await queryRunner.commitTransaction();
         return _.omit(newContract, ['signedByAdmin', 'signedByUser']);
       }
@@ -1153,9 +1157,15 @@ export class BookingService {
         throw new NotFoundException('The contract not found');
       }
 
-      if (booking.status === 'confirmed') {
+      if (booking.status !== 'pending' && booking.status !== 'confirmed') {
         throw new ConflictException(
-          'Cannot undo contract for a confirmed booking',
+          'Cannot undo contract for a booking with this status',
+        );
+      }
+
+      if (booking.contract.signedByUser) {
+        throw new ConflictException(
+          'Cannot undo contract that has already been signed by the guest',
         );
       }
 

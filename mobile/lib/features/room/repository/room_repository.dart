@@ -56,7 +56,7 @@ class RoomRepository {
 
   Future<List<RoomTypeModel>> getRoomTypes() async {
     try {
-      final response = await _apiClient.get('/room/type');
+      final response = await _apiClient.get('/room-type');
       final payload = response.data;
       if (payload is! Map<String, dynamic>) return [];
       final data = payload['data'];

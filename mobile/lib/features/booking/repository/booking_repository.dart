@@ -71,7 +71,7 @@ class BookingRepository {
 
   Future<List<VoucherModel>> getUserVouchers() async {
     try {
-      final res = await _api.get('/voucher/customer');
+      final res = await _api.get('/voucher/customer', queryParameters: {'page': 1, 'limit': 100});
       final payload = _check(res.data);
       final data = payload['data'];
       List raw = [];

@@ -75,7 +75,7 @@ class _FavoriteRoomsState extends State<_FavoriteRooms> with AutomaticKeepAliveC
   Future<void> _load() async {
     setState(() => _loading = true);
     try {
-      final res = await _api.get('/user/favorite-room');
+      final res = await _api.get('/user/favorite-room', queryParameters: {'page': 1, 'limit': 100});
       final payload = res.data as Map<String, dynamic>;
       final data = payload['data'];
       List raw = [];
@@ -219,7 +219,7 @@ class _FavoriteServicesState extends State<_FavoriteServices> with AutomaticKeep
   Future<void> _load() async {
     setState(() => _loading = true);
     try {
-      final res = await _api.get('/user/favorite-service');
+      final res = await _api.get('/user/favorite-service', queryParameters: {'page': 1, 'limit': 100});
       final payload = res.data as Map<String, dynamic>;
       final data = payload['data'];
       List raw = [];

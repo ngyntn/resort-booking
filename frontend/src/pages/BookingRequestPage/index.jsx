@@ -228,7 +228,7 @@ export default function BookingRequestPage() {
                 })
               }
               loading={undoContractReq?.param?.bookingId === record.id && isUndoingContract}
-              hidden={!(record.contract && record.status === 'pending')}
+              hidden={!(record.contract && !record.contract.signedByUser && (record.status === 'pending' || record.status === 'confirmed'))}
             />
           </Tooltip>
 
@@ -481,6 +481,8 @@ export default function BookingRequestPage() {
             value: true,
           });
           setOpenReasonOfRejectionModal(false);
+          rejectBookingForm.resetFields();
+          setSelectedRowToReject(null);
         } else {
           openNotification({
             title: rejectBookingResData.error.message.toString(),
@@ -1030,10 +1032,18 @@ export default function BookingRequestPage() {
         <Modal
           title="Reason For Rejection"
           open={isOpenReasonOfRejectionModal}
-          onCancel={() => setOpenReasonOfRejectionModal(false)}
+          onCancel={() => {
+            setOpenReasonOfRejectionModal(false);
+            rejectBookingForm.resetFields();
+            setSelectedRowToReject(null);
+          }}
           width={520}
           footer={[
-            <Button key="back" onClick={() => setOpenContractPreviewModal(false)}>
+            <Button key="back" onClick={() => {
+              setOpenReasonOfRejectionModal(false);
+              rejectBookingForm.resetFields();
+              setSelectedRowToReject(null);
+            }}>
               Cancel
             </Button>,
             <Button key="submit" type="primary" onClick={handleRejectBookingSubmit} loading={isRejectingBooking}>
@@ -1046,7 +1056,17 @@ export default function BookingRequestPage() {
               <Input disabled />
             </Form.Item>
 
-            <Form.Item name="reasonForRejection" label="Reason For Rejection" rules={[{ required: true }]}>
+            <Form.Item
+              name="reasonForRejection"
+              label="Reason For Rejection"
+              rules={[{
+                validator: (_, value) => {
+                  const text = (value || '').replace(/<[^>]*>/g, '').replace(/&nbsp;/g, ' ').trim();
+                  if (!text) return Promise.reject(new Error('Please enter a reason for rejection'));
+                  return Promise.resolve();
+                }
+              }]}
+            >
               <TextEditor
                 disabled={isRejectingBooking}
                 initialValue={rejectBookingForm.getFieldValue('reasonForRejection')}
