@@ -548,8 +548,8 @@ queryRunner.release()            → <span class="string">called ✓</span></pre
                     <pre class="code-block"><span class="comment">// BookingRoomReqDto – userId: 10</span>
 {
   <span class="key">"roomId"</span>: <span class="number">1</span>,
-  <span class="key">"startDate"</span>: <span class="string">"2026-01-03"</span>,
-  <span class="key">"endDate"</span>: <span class="string">"2026-01-05"</span>,  <span class="comment">// 3 ngày</span>
+  <span class="key">"startDate"</span>: <span class="string">"2026-07-10"</span>,
+  <span class="key">"endDate"</span>: <span class="string">"2026-07-13"</span>,  <span class="comment">// 4 ngày</span>
   <span class="key">"capacity"</span>: <span class="number">2</span>
 }</pre>
                     <div class="section-label mt-3">Mock Database State</div>
@@ -565,14 +565,15 @@ findOne(Room, { where: { id: <span class="number">1</span> } }) → {
 <span class="comment">// Không có booking nào trùng thời gian</span>
 createQueryBuilder(Booking).getOne() → <span class="number">null</span>
 
-<span class="comment">// Thời điểm test cố định</span>
-fixedNow = <span class="string">"2026-01-01T00:00:00Z"</span></pre>
+<span class="comment">// Mock clock (jest.useFakeTimers)</span>
+fixedNow = <span class="string">"2026-01-01T00:00:00Z"</span>
+<span class="comment">// startDate / endDate đều sau fixedNow → qua validation ✓</span></pre>
                     <div class="section-label mt-3">Tính toán totalPrice</div>
-                    <pre class="code-block">startDate = 2026-01-03
-endDate   = 2026-01-05
-Số ngày   = 3 ngày
+                    <pre class="code-block">startDate = 2026-07-10
+endDate   = 2026-07-13
+Số ngày   = diff(endDate, startDate) + 1 = 3 + 1 = 4 ngày
 
-totalPrice = 150.00 × 3 = <span class="number">450.00</span> ✓</pre>
+totalPrice = 150.00 × 4 = <span class="number">600.00</span> ✓</pre>
                   </div>
                 </div>
               </div>
@@ -592,18 +593,18 @@ totalPrice = 150.00 × 3 = <span class="number">450.00</span> ✓</pre>
   <span class="key">"roomNumber"</span>: <span class="string">"101A"</span>,
   <span class="key">"capacity"</span>: <span class="number">2</span>,
   <span class="key">"roomPrice"</span>: <span class="string">"150.00"</span>,
-  <span class="key">"startDate"</span>: <span class="string">"2026-01-03"</span>,
-  <span class="key">"endDate"</span>: <span class="string">"2026-01-05"</span>,
+  <span class="key">"startDate"</span>: <span class="string">"2026-07-10"</span>,
+  <span class="key">"endDate"</span>: <span class="string">"2026-07-13"</span>,
   <span class="key">"status"</span>: <span class="string">"pending"</span>,
-  <span class="key">"totalPrice"</span>: <span class="string">"450.00"</span>,  <span class="comment">// 150 × 3 ngày ✓</span>
-  <span class="key">"createdAt"</span>: <span class="string">"2026-01-01T00:00:00.000Z"</span>
+  <span class="key">"totalPrice"</span>: <span class="string">"600.00"</span>,  <span class="comment">// 150 × 4 ngày ✓</span>
+  <span class="key">"createdAt"</span>: <span class="string">"2026-06-01T00:00:00.000Z"</span>
 }</pre>
                     <div class="mt-3">
                       <div class="result-box passed">
                         <div class="result-box-icon">✅</div>
                         <div class="result-box-content">
                           <div class="label">Kết quả thực tế</div>
-                          <div>Booking được tạo với <span class="response-tag">status: "pending"</span> &bull; <span class="response-tag">totalPrice: "450.00"</span> tính đúng &bull; Transaction commit thành công</div>
+                          <div>Booking được tạo với <span class="response-tag">status: "pending"</span> &bull; <span class="response-tag">totalPrice: "600.00"</span> tính đúng &bull; Transaction commit thành công</div>
                         </div>
                       </div>
                     </div>
@@ -656,8 +657,8 @@ totalPrice = 150.00 × 3 = <span class="number">450.00</span> ✓</pre>
                     <pre class="code-block"><span class="comment">// capacity = 5 > maxPeople = 4 ⚠️</span>
 {
   <span class="key">"roomId"</span>: <span class="number">1</span>,
-  <span class="key">"startDate"</span>: <span class="string">"2026-01-03"</span>,
-  <span class="key">"endDate"</span>: <span class="string">"2026-01-05"</span>,
+  <span class="key">"startDate"</span>: <span class="string">"2026-07-10"</span>,
+  <span class="key">"endDate"</span>: <span class="string">"2026-07-13"</span>,
   <span class="key">"capacity"</span>: <span class="number">5</span>  <span class="comment">// Vượt giới hạn!</span>
 }</pre>
                     <div class="section-label mt-3">Mock Database State</div>
@@ -746,8 +747,8 @@ findOne(Room) → {
                     <div class="section-label">Request Payload</div>
                     <pre class="code-block">{
   <span class="key">"roomId"</span>: <span class="number">1</span>,
-  <span class="key">"startDate"</span>: <span class="string">"2026-01-03"</span>,
-  <span class="key">"endDate"</span>: <span class="string">"2026-01-05"</span>,
+  <span class="key">"startDate"</span>: <span class="string">"2026-07-10"</span>,
+  <span class="key">"endDate"</span>: <span class="string">"2026-07-13"</span>,
   <span class="key">"capacity"</span>: <span class="number">2</span>
 }</pre>
                     <div class="section-label mt-3">Mock Database State</div>
@@ -761,7 +762,7 @@ createQueryBuilder(Booking)
   .getOne() → {
     <span class="key">id</span>: <span class="number">100</span>,
     <span class="key">roomId</span>: <span class="number">1</span>
-    <span class="comment">// Booking này chiếm 2026-01-03 → 2026-01-05</span>
+    <span class="comment">// Booking này chiếm 2026-07-10 → 2026-07-13</span>
   }</pre>
                   </div>
                 </div>

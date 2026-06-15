@@ -105,8 +105,8 @@ describe('BookingService', () => {
     it('should create pending booking and calculate totalPrice correctly', async () => {
       const payload = {
         roomId: 1,
-        startDate: '2026-01-03',
-        endDate: '2026-01-05',
+        startDate: '2026-07-10',
+        endDate: '2026-07-13',
         capacity: 2,
       } as BookingRoomReqDto;
 
@@ -127,7 +127,7 @@ describe('BookingService', () => {
         endDate: payload.endDate,
         status: 'pending',
         createdAt: fixedNow,
-        totalPrice: '450.00',
+        totalPrice: '600.00',
       };
 
       mockQueryRunner.manager.save.mockResolvedValue(expectedBooking);
@@ -198,8 +198,8 @@ describe('BookingService', () => {
     it('should throw BadRequestException when capacity exceeds room maxPeople', async () => {
       const payload = {
         roomId: 1,
-        startDate: '2026-01-03',
-        endDate: '2026-01-05',
+        startDate: '2026-07-10',
+        endDate: '2026-07-13',
         capacity: 5,
       } as BookingRoomReqDto;
 
@@ -223,8 +223,8 @@ describe('BookingService', () => {
     it('should throw ConflictException when a booking already overlaps', async () => {
       const payload = {
         roomId: 1,
-        startDate: '2026-01-03',
-        endDate: '2026-01-05',
+        startDate: '2026-07-10',
+        endDate: '2026-07-13',
         capacity: 2,
       } as BookingRoomReqDto;
 
