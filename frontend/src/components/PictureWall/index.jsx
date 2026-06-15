@@ -71,7 +71,7 @@ export default function PictureWall({ initialValue, onChange }) {
 
   return (
     <>
-      <Upload
+      {/* <Upload
         customRequest={handleCustomRequest}
         accept="image/jpg, image/jpeg, image/png"
         listType="picture-card"
@@ -80,7 +80,19 @@ export default function PictureWall({ initialValue, onChange }) {
         onChange={handleChange}
       >
         {uploadButton}
-      </Upload>
+      </Upload> */}
+      <div data-testid="creating-room-media-upload">
+        <Upload
+          customRequest={handleCustomRequest}
+          accept="image/jpg, image/jpeg, image/png"
+          listType="picture-card"
+          fileList={fileList}
+          onPreview={handlePreview}
+          onChange={handleChange}
+        >
+          {uploadButton}
+        </Upload>
+      </div>
       {previewImage && (
         <Image
           wrapperStyle={{ display: "none" }}

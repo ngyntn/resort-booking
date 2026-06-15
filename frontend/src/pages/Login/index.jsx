@@ -110,6 +110,7 @@ const Login = () => {
           {loginError && <p className="text-red-600 text-sm mb-4 text-center">{loginError}</p>}
           <form onSubmit={handleLogin}>
             <input
+              data-testid="email-login-input"
               type="email"
               placeholder="Email"
               value={email}
@@ -118,6 +119,7 @@ const Login = () => {
             />
             <div className="relative mb-4">
               <input
+                data-testid="password-login-input"
                 type={showPassword ? 'text' : 'password'}
                 placeholder="Password"
                 value={password}
@@ -176,6 +178,7 @@ const Login = () => {
               </label>
             </div>
             <button
+              data-testid="login-button"
               type="submit"
               className="w-full bg-[#0D584D] hover:bg-teal-500 text-white font-semibold py-2 rounded-lg"
             >

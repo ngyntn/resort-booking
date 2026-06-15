@@ -115,50 +115,10 @@ const SignIn = () => {
       <div className="hidden md:flex items-center space-x-4 mt-12">
         {isLoggedIn ? (
           <div className="center-both gap-4">
-            {/* <Popover open={isOpen} onOpenChange={setIsOpen}>
-              <PopoverTrigger asChild>
-                <Button
-                  variant="outline"
-                  size="icon"
-                  className="relative rounded-full border border-transparent hover:border-gray-300"
-                >
-                  <Bell className="h-4 w-4" />
-                  {sortedNotifications.length > 0 && (
-                    <Badge
-                      variant="destructive"
-                      className="absolute -top-2 -right-2 h-5 w-5 rounded-full p-0 flex items-center justify-center text-xs"
-                    >
-                      {sortedNotifications.length}
-                    </Badge>
-                  )}
-                </Button>
-              </PopoverTrigger>
-              <PopoverContent className="w-96 p-0" align="end">
-                <div className="flex items-center justify-between p-2 border-b border-gray-200">
-                  <h3 className="font-bold">Notifications</h3>
-                </div>
-
-                {sortedNotifications.length === 0 ? (
-                  <p className="p-3 text-gray-500">There is no new notice</p>
-                ) : (
-                  <ScrollArea className="h-96">
-                    {sortedNotifications.map((notification) => (
-                      <div
-                        key={notification.id}
-                        className="flex flex-col gap-1 p-3 rounded-lg hover:bg-gray-100 transition-colors border-b border-gray-200 last:border-b-0"
-                      >
-                        <p className="text-sm font-medium text-gray-900">{notification.title}</p>
-                        <p className="text-sm text-gray-600">{notification.message}</p>
-                        <p className="text-xs text-gray-500">{notification.time}</p>
-                      </div>
-                    ))}
-                  </ScrollArea>
-                )}
-              </PopoverContent>
-            </Popover> */}
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button
+                  data-testid="home-user-dropdown-btn"
                   variant="outline"
                   size="icon"
                   className="rounded-full border border-transparent hover:border-gray-300"
@@ -201,11 +161,11 @@ const SignIn = () => {
           </div>
         ) : (
           <div className="flex items-center space-x-3">
-            <Button
+            <Button asChild
               variant="ghost"
               className="text-gray-700 hover:text-teal-700 border border-teal-200 hover:bg-teal-50"
             >
-              <Link to="/login">Sign In</Link>
+              <Link data-testid="home-signin-btn" to="/login">Sign In</Link>
             </Button>
             <Button className="bg-teal-600 hover:bg-teal-700">
               <Link to="/signup">Sign Up</Link>
