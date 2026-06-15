@@ -1,0 +1,813 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>API Test Demo – Resort Booking System</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
+  <style>
+    :root {
+      --primary: #1a3c5e;
+      --accent: #2563eb;
+      --success: #16a34a;
+      --warning: #b45309;
+      --danger: #dc2626;
+      --light-bg: #f8fafc;
+    }
+    body {
+      background: #f1f5f9;
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      min-height: 100vh;
+    }
+    .page-header {
+      background: linear-gradient(135deg, var(--primary) 0%, #2563eb 100%);
+      color: #fff;
+      padding: 2rem 2rem 1.5rem;
+      border-radius: 0 0 1.5rem 1.5rem;
+      margin-bottom: 2rem;
+      box-shadow: 0 4px 20px rgba(37,99,235,0.25);
+    }
+    .page-header .subtitle {
+      opacity: 0.8;
+      font-size: 0.95rem;
+      margin-top: 0.25rem;
+    }
+    .badge-module {
+      font-size: 0.72rem;
+      letter-spacing: 0.04em;
+      padding: 0.3em 0.7em;
+      border-radius: 999px;
+    }
+    /* Tab nav */
+    .tc-nav {
+      border-bottom: none;
+      gap: 0.5rem;
+      flex-wrap: nowrap;
+      overflow-x: auto;
+      padding-bottom: 0;
+    }
+    .tc-nav .nav-link {
+      border-radius: 0.75rem 0.75rem 0 0 !important;
+      border: 2px solid transparent !important;
+      background: #e2e8f0;
+      color: #475569;
+      font-weight: 600;
+      font-size: 0.88rem;
+      padding: 0.6rem 1.1rem;
+      white-space: nowrap;
+      transition: all 0.2s;
+    }
+    .tc-nav .nav-link:hover {
+      background: #dbeafe;
+      color: var(--accent);
+    }
+    .tc-nav .nav-link.active {
+      background: #fff;
+      color: var(--accent);
+      border-color: #bfdbfe !important;
+      border-bottom-color: #fff !important;
+    }
+    .tc-nav .tc-number {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 1.6rem;
+      height: 1.6rem;
+      border-radius: 50%;
+      font-size: 0.75rem;
+      font-weight: 700;
+      margin-right: 0.4rem;
+    }
+    .nav-link.active .tc-number { background: var(--accent); color: #fff; }
+    .nav-link:not(.active) .tc-number { background: #94a3b8; color: #fff; }
+
+    /* Tab content card */
+    .tab-content-wrap {
+      background: #fff;
+      border-radius: 0 0.75rem 0.75rem 0.75rem;
+      border: 2px solid #bfdbfe;
+      padding: 0;
+      overflow: hidden;
+    }
+    .tc-header {
+      padding: 1.25rem 1.5rem;
+      border-bottom: 1px solid #e2e8f0;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+    .tc-title {
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: var(--primary);
+      margin: 0;
+    }
+    .tc-body {
+      padding: 1.25rem 1.5rem;
+    }
+
+    /* Accordion */
+    .accordion-button {
+      font-weight: 600;
+      font-size: 0.9rem;
+      color: var(--primary);
+      background: var(--light-bg);
+    }
+    .accordion-button:not(.collapsed) {
+      background: #eff6ff;
+      color: var(--accent);
+      box-shadow: none;
+    }
+    .accordion-button::after { filter: none; }
+    .accordion-item { border: 1px solid #e2e8f0; border-radius: 0.5rem !important; margin-bottom: 0.6rem; overflow: hidden; }
+    .accordion-item:last-child { margin-bottom: 0; }
+
+    /* Code blocks */
+    pre.code-block {
+      background: #0f172a;
+      color: #e2e8f0;
+      border-radius: 0.5rem;
+      padding: 1rem 1.25rem;
+      font-size: 0.82rem;
+      line-height: 1.6;
+      overflow-x: auto;
+      margin: 0;
+    }
+    pre.code-block .key { color: #93c5fd; }
+    pre.code-block .string { color: #86efac; }
+    pre.code-block .number { color: #fbbf24; }
+    pre.code-block .comment { color: #94a3b8; font-style: italic; }
+    pre.code-block .error-key { color: #f87171; }
+
+    /* Result box */
+    .result-box {
+      border-radius: 0.6rem;
+      padding: 1rem 1.25rem;
+      display: flex;
+      align-items: flex-start;
+      gap: 0.75rem;
+    }
+    .result-box.passed {
+      background: #f0fdf4;
+      border: 1.5px solid #86efac;
+    }
+    .result-box.error-expected {
+      background: #fefce8;
+      border: 1.5px solid #fde047;
+    }
+    .result-box-icon { font-size: 1.5rem; line-height: 1; }
+    .result-box-content { flex: 1; }
+    .result-box-content .label {
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      margin-bottom: 0.3rem;
+    }
+    .passed .label { color: var(--success); }
+    .error-expected .label { color: var(--warning); }
+
+    /* Error message tag */
+    .error-msg {
+      display: inline-block;
+      background: #fef2f2;
+      border: 1px solid #fecaca;
+      color: #b91c1c;
+      border-radius: 0.35rem;
+      padding: 0.25rem 0.7rem;
+      font-size: 0.82rem;
+      font-weight: 600;
+      font-family: monospace;
+    }
+    .response-tag {
+      display: inline-block;
+      background: #f0fdf4;
+      border: 1px solid #86efac;
+      color: #15803d;
+      border-radius: 0.35rem;
+      padding: 0.25rem 0.7rem;
+      font-size: 0.82rem;
+      font-weight: 600;
+      font-family: monospace;
+    }
+
+    /* Big PASSED badge */
+    .badge-passed {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      background: var(--success);
+      color: #fff;
+      border-radius: 999px;
+      padding: 0.45em 1.1em;
+      font-size: 0.95rem;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+      box-shadow: 0 2px 8px rgba(22,163,74,0.3);
+    }
+
+    /* Type tag */
+    .type-success { background: #d1fae5; color: #065f46; }
+    .type-error { background: #fef3c7; color: #78350f; }
+
+    .info-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+      gap: 0.6rem;
+      margin-bottom: 0.75rem;
+    }
+    .info-item {
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 0.4rem;
+      padding: 0.5rem 0.75rem;
+    }
+    .info-item .info-label {
+      font-size: 0.7rem;
+      color: #94a3b8;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    .info-item .info-value {
+      font-size: 0.88rem;
+      font-weight: 600;
+      color: #1e293b;
+    }
+
+    .section-label {
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: #64748b;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      margin-bottom: 0.5rem;
+    }
+
+    @media (max-width: 640px) {
+      .page-header { padding: 1.25rem 1rem 1rem; border-radius: 0; }
+      .tc-body, .tc-header { padding: 1rem; }
+    }
+  </style>
+</head>
+<body>
+  <div class="page-header">
+    <div class="container-lg">
+      <div class="d-flex align-items-start gap-3">
+        <div>
+          <div class="d-flex align-items-center gap-2 mb-1">
+            <i class="bi bi-shield-check fs-4"></i>
+            <h1 class="h4 mb-0 fw-bold">API Test Demo</h1>
+          </div>
+          <div class="subtitle">Resort Booking System &mdash; Unit Test Cases (NestJS + Jest)</div>
+          <div class="d-flex gap-2 mt-2 flex-wrap">
+            <span class="badge bg-white text-primary fw-semibold">5 Test Cases</span>
+            <span class="badge bg-success">All PASSED</span>
+            <span class="badge bg-white bg-opacity-25 text-white">room.controller.spec.ts</span>
+            <span class="badge bg-white bg-opacity-25 text-white">booking.service.spec.ts</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="container-lg pb-5">
+    <!-- Tab nav -->
+    <ul class="nav tc-nav mb-0" id="tcTabs" role="tablist">
+      <li class="nav-item" role="presentation">
+        <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#tc01" type="button" role="tab">
+          <span class="tc-number">1</span> TC01
+          <span class="badge badge-module ms-1 type-success">Success</span>
+        </button>
+      </li>
+      <li class="nav-item" role="presentation">
+        <button class="nav-link" data-bs-toggle="tab" data-bs-target="#tc02" type="button" role="tab">
+          <span class="tc-number">2</span> TC02
+          <span class="badge badge-module ms-1 type-error">Error</span>
+        </button>
+      </li>
+      <li class="nav-item" role="presentation">
+        <button class="nav-link" data-bs-toggle="tab" data-bs-target="#tc09" type="button" role="tab">
+          <span class="tc-number">3</span> TC09
+          <span class="badge badge-module ms-1 type-success">Success</span>
+        </button>
+      </li>
+      <li class="nav-item" role="presentation">
+        <button class="nav-link" data-bs-toggle="tab" data-bs-target="#tc12" type="button" role="tab">
+          <span class="tc-number">4</span> TC12
+          <span class="badge badge-module ms-1 type-error">Error</span>
+        </button>
+      </li>
+      <li class="nav-item" role="presentation">
+        <button class="nav-link" data-bs-toggle="tab" data-bs-target="#tc13" type="button" role="tab">
+          <span class="tc-number">5</span> TC13
+          <span class="badge badge-module ms-1 type-error">Error</span>
+        </button>
+      </li>
+    </ul>
+
+    <div class="tab-content-wrap">
+      <div class="tab-content" id="tcTabsContent">
+
+        <!-- ===================== TC01 ===================== -->
+        <div class="tab-pane fade show active" id="tc01" role="tabpanel">
+          <div class="tc-header">
+            <span class="badge bg-primary badge-module">Room Module</span>
+            <h2 class="tc-title">TC01 &ndash; Tạo phòng thành công đầy đủ thông tin</h2>
+            <span class="badge-passed ms-auto"><i class="bi bi-check-circle-fill"></i> PASSED</span>
+          </div>
+          <div class="tc-body">
+            <div class="accordion" id="acc01">
+
+              <div class="accordion-item">
+                <h2 class="accordion-header">
+                  <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#acc01-desc">
+                    <i class="bi bi-info-circle me-2 text-primary"></i> Mô tả
+                  </button>
+                </h2>
+                <div id="acc01-desc" class="accordion-collapse collapse show">
+                  <div class="accordion-body">
+                    <p class="mb-2">Kiểm tra tạo phòng thành công khi cung cấp đầy đủ thông tin hợp lệ: số phòng chưa tồn tại, giá nằm trong khoảng giá của loại phòng.</p>
+                    <div class="info-grid">
+                      <div class="info-item"><div class="info-label">Endpoint</div><div class="info-value">POST /room</div></div>
+                      <div class="info-item"><div class="info-label">Module</div><div class="info-value">RoomController</div></div>
+                      <div class="info-item"><div class="info-label">Loại test</div><div class="info-value">Happy Path</div></div>
+                      <div class="info-item"><div class="info-label">File</div><div class="info-value">room.controller.spec.ts</div></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="accordion-item">
+                <h2 class="accordion-header">
+                  <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#acc01-input">
+                    <i class="bi bi-code-square me-2 text-warning"></i> Input / Setup
+                  </button>
+                </h2>
+                <div id="acc01-input" class="accordion-collapse collapse">
+                  <div class="accordion-body">
+                    <div class="section-label">Request Payload</div>
+                    <pre class="code-block"><span class="comment">// CreateRoomReqDto</span>
+{
+  <span class="key">"roomNumber"</span>: <span class="string">"101A"</span>,
+  <span class="key">"typeId"</span>: <span class="number">1</span>,
+  <span class="key">"maxPeople"</span>: <span class="number">2</span>,
+  <span class="key">"price"</span>: <span class="string">"150.00"</span>,
+  <span class="key">"description"</span>: <span class="string">"Room for two guests"</span>,
+  <span class="key">"media"</span>: [<span class="string">"uploads/room-101A-1.jpg"</span>]
+}</pre>
+                    <div class="section-label mt-3">Mock Database State</div>
+                    <pre class="code-block"><span class="comment">// Room với roomNumber "101A" chưa tồn tại</span>
+findOne(Room, { where: { roomNumber: <span class="string">"101A"</span> } }) → <span class="number">null</span>
+
+<span class="comment">// RoomType tồn tại và có khoảng giá hợp lệ</span>
+findOne(RoomType, { where: { id: <span class="number">1</span> } }) → {
+  <span class="key">id</span>: <span class="number">1</span>,
+  <span class="key">minPrice</span>: <span class="string">"100.00"</span>,  <span class="comment">// ≤ 150.00</span>
+  <span class="key">maxPrice</span>: <span class="string">"200.00"</span>   <span class="comment">// ≥ 150.00 ✓</span>
+}</pre>
+                  </div>
+                </div>
+              </div>
+
+              <div class="accordion-item">
+                <h2 class="accordion-header">
+                  <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#acc01-result">
+                    <i class="bi bi-check2-all me-2 text-success"></i> Kết quả
+                  </button>
+                </h2>
+                <div id="acc01-result" class="accordion-collapse collapse">
+                  <div class="accordion-body">
+                    <div class="section-label">Expected Response</div>
+                    <pre class="code-block">{
+  <span class="key">"statusCode"</span>: <span class="number">200</span>,
+  <span class="key">"isSuccess"</span>: <span class="number">true</span>,
+  <span class="key">"data"</span>: {
+    <span class="key">"id"</span>: <span class="number">123</span>,
+    <span class="key">"roomNumber"</span>: <span class="string">"101A"</span>,
+    <span class="key">"typeId"</span>: <span class="number">1</span>,
+    <span class="key">"maxPeople"</span>: <span class="number">2</span>,
+    <span class="key">"price"</span>: <span class="string">"150.00"</span>,
+    <span class="key">"status"</span>: <span class="string">"active"</span>,
+    <span class="key">"newMedia"</span>: [{ <span class="key">"id"</span>: <span class="number">1</span>, <span class="key">"path"</span>: <span class="string">"uploads/room-101A-1.jpg"</span> }]
+  },
+  <span class="key">"error"</span>: <span class="number">null</span>
+}</pre>
+                    <div class="mt-3">
+                      <div class="result-box passed">
+                        <div class="result-box-icon">✅</div>
+                        <div class="result-box-content">
+                          <div class="label">Kết quả thực tế</div>
+                          <div>Transaction commit thành công &bull; Room được lưu vào DB &bull; Media được tạo &bull; Response trả về đúng cấu trúc</div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+            </div>
+          </div>
+        </div>
+
+        <!-- ===================== TC02 ===================== -->
+        <div class="tab-pane fade" id="tc02" role="tabpanel">
+          <div class="tc-header">
+            <span class="badge bg-primary badge-module">Room Module</span>
+            <h2 class="tc-title">TC02 &ndash; Tạo phòng với roomNumber đã tồn tại</h2>
+            <span class="badge-passed ms-auto"><i class="bi bi-check-circle-fill"></i> PASSED</span>
+          </div>
+          <div class="tc-body">
+            <div class="accordion" id="acc02">
+
+              <div class="accordion-item">
+                <h2 class="accordion-header">
+                  <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#acc02-desc">
+                    <i class="bi bi-info-circle me-2 text-primary"></i> Mô tả
+                  </button>
+                </h2>
+                <div id="acc02-desc" class="accordion-collapse collapse show">
+                  <div class="accordion-body">
+                    <p class="mb-2">Kiểm tra hệ thống từ chối tạo phòng khi <code>roomNumber</code> đã tồn tại trong cơ sở dữ liệu. Transaction phải được rollback và không có dữ liệu nào được lưu.</p>
+                    <div class="info-grid">
+                      <div class="info-item"><div class="info-label">Endpoint</div><div class="info-value">POST /room</div></div>
+                      <div class="info-item"><div class="info-label">Module</div><div class="info-value">RoomController</div></div>
+                      <div class="info-item"><div class="info-label">Loại test</div><div class="info-value">Error Path</div></div>
+                      <div class="info-item"><div class="info-label">HTTP Error</div><div class="info-value">400 Bad Request</div></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="accordion-item">
+                <h2 class="accordion-header">
+                  <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#acc02-input">
+                    <i class="bi bi-code-square me-2 text-warning"></i> Input / Setup
+                  </button>
+                </h2>
+                <div id="acc02-input" class="accordion-collapse collapse">
+                  <div class="accordion-body">
+                    <div class="section-label">Request Payload</div>
+                    <pre class="code-block"><span class="comment">// CreateRoomReqDto – giống TC01 nhưng roomNumber đã tồn tại</span>
+{
+  <span class="key">"roomNumber"</span>: <span class="string">"101A"</span>,
+  <span class="key">"typeId"</span>: <span class="number">1</span>,
+  <span class="key">"maxPeople"</span>: <span class="number">2</span>,
+  <span class="key">"price"</span>: <span class="string">"150.00"</span>,
+  <span class="key">"description"</span>: <span class="string">"Room for two guests"</span>,
+  <span class="key">"media"</span>: [<span class="string">"uploads/room-101A-1.jpg"</span>]
+}</pre>
+                    <div class="section-label mt-3">Mock Database State</div>
+                    <pre class="code-block"><span class="comment">// Room với roomNumber "101A" ĐÃ TỒN TẠI</span>
+findOne(Room, { where: { roomNumber: <span class="string">"101A"</span> } }) → {
+  <span class="key">id</span>: <span class="number">1</span>,
+  <span class="key">roomNumber</span>: <span class="string">"101A"</span>  <span class="comment">// Duplicate! ⚠️</span>
+}</pre>
+                  </div>
+                </div>
+              </div>
+
+              <div class="accordion-item">
+                <h2 class="accordion-header">
+                  <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#acc02-result">
+                    <i class="bi bi-check2-all me-2 text-success"></i> Kết quả
+                  </button>
+                </h2>
+                <div id="acc02-result" class="accordion-collapse collapse">
+                  <div class="accordion-body">
+                    <div class="section-label">Expected Exception</div>
+                    <pre class="code-block"><span class="comment">// Throws BadRequestException</span>
+{
+  <span class="error-key">"statusCode"</span>: <span class="number">400</span>,
+  <span class="error-key">"error"</span>: <span class="string">"Bad Request"</span>,
+  <span class="error-key">"message"</span>: <span class="string">"Room number already exists"</span>
+}</pre>
+                    <div class="section-label mt-3">Transaction Assertions</div>
+                    <pre class="code-block">queryRunner.connect()            → <span class="string">called ✓</span>
+queryRunner.startTransaction()   → <span class="string">called ✓</span>
+queryRunner.commitTransaction()  → <span class="string">NOT called ✓</span>
+queryRunner.rollbackTransaction()→ <span class="string">called ✓</span>
+queryRunner.release()            → <span class="string">called ✓</span></pre>
+                    <div class="mt-3">
+                      <div class="result-box error-expected">
+                        <div class="result-box-icon">✅</div>
+                        <div class="result-box-content">
+                          <div class="label">Kết quả thực tế</div>
+                          <div>Exception <span class="error-msg">BadRequestException</span> được ném đúng &bull; Message: <span class="error-msg">Room number already exists</span> &bull; Transaction rollback thành công</div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+            </div>
+          </div>
+        </div>
+
+        <!-- ===================== TC09 ===================== -->
+        <div class="tab-pane fade" id="tc09" role="tabpanel">
+          <div class="tc-header">
+            <span class="badge bg-danger badge-module">Booking Module</span>
+            <h2 class="tc-title">TC09 &ndash; Gửi yêu cầu đặt phòng hợp lệ</h2>
+            <span class="badge-passed ms-auto"><i class="bi bi-check-circle-fill"></i> PASSED</span>
+          </div>
+          <div class="tc-body">
+            <div class="accordion" id="acc09">
+
+              <div class="accordion-item">
+                <h2 class="accordion-header">
+                  <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#acc09-desc">
+                    <i class="bi bi-info-circle me-2 text-primary"></i> Mô tả
+                  </button>
+                </h2>
+                <div id="acc09-desc" class="accordion-collapse collapse show">
+                  <div class="accordion-body">
+                    <p class="mb-2">Kiểm tra đặt phòng thành công: tạo booking với trạng thái <code>pending</code> và tính đúng <code>totalPrice</code> theo công thức: <strong>giá phòng × số ngày thuê</strong>.</p>
+                    <div class="info-grid">
+                      <div class="info-item"><div class="info-label">Endpoint</div><div class="info-value">POST /booking</div></div>
+                      <div class="info-item"><div class="info-label">Module</div><div class="info-value">BookingService</div></div>
+                      <div class="info-item"><div class="info-label">Loại test</div><div class="info-value">Happy Path</div></div>
+                      <div class="info-item"><div class="info-label">File</div><div class="info-value">booking.service.spec.ts</div></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="accordion-item">
+                <h2 class="accordion-header">
+                  <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#acc09-input">
+                    <i class="bi bi-code-square me-2 text-warning"></i> Input / Setup
+                  </button>
+                </h2>
+                <div id="acc09-input" class="accordion-collapse collapse">
+                  <div class="accordion-body">
+                    <div class="section-label">Request Payload</div>
+                    <pre class="code-block"><span class="comment">// BookingRoomReqDto – userId: 10</span>
+{
+  <span class="key">"roomId"</span>: <span class="number">1</span>,
+  <span class="key">"startDate"</span>: <span class="string">"2026-01-03"</span>,
+  <span class="key">"endDate"</span>: <span class="string">"2026-01-05"</span>,  <span class="comment">// 3 ngày</span>
+  <span class="key">"capacity"</span>: <span class="number">2</span>
+}</pre>
+                    <div class="section-label mt-3">Mock Database State</div>
+                    <pre class="code-block"><span class="comment">// Phòng tồn tại, đang active và còn trống</span>
+findOne(Room, { where: { id: <span class="number">1</span> } }) → {
+  <span class="key">id</span>: <span class="number">1</span>,
+  <span class="key">roomNumber</span>: <span class="string">"101A"</span>,
+  <span class="key">maxPeople</span>: <span class="number">4</span>,
+  <span class="key">price</span>: <span class="string">"150.00"</span>,
+  <span class="key">status</span>: <span class="string">"active"</span>
+}
+
+<span class="comment">// Không có booking nào trùng thời gian</span>
+createQueryBuilder(Booking).getOne() → <span class="number">null</span>
+
+<span class="comment">// Thời điểm test cố định</span>
+fixedNow = <span class="string">"2026-01-01T00:00:00Z"</span></pre>
+                    <div class="section-label mt-3">Tính toán totalPrice</div>
+                    <pre class="code-block">startDate = 2026-01-03
+endDate   = 2026-01-05
+Số ngày   = 3 ngày
+
+totalPrice = 150.00 × 3 = <span class="number">450.00</span> ✓</pre>
+                  </div>
+                </div>
+              </div>
+
+              <div class="accordion-item">
+                <h2 class="accordion-header">
+                  <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#acc09-result">
+                    <i class="bi bi-check2-all me-2 text-success"></i> Kết quả
+                  </button>
+                </h2>
+                <div id="acc09-result" class="accordion-collapse collapse">
+                  <div class="accordion-body">
+                    <div class="section-label">Expected Booking Record</div>
+                    <pre class="code-block">{
+  <span class="key">"userId"</span>: <span class="number">10</span>,
+  <span class="key">"roomId"</span>: <span class="number">1</span>,
+  <span class="key">"roomNumber"</span>: <span class="string">"101A"</span>,
+  <span class="key">"capacity"</span>: <span class="number">2</span>,
+  <span class="key">"roomPrice"</span>: <span class="string">"150.00"</span>,
+  <span class="key">"startDate"</span>: <span class="string">"2026-01-03"</span>,
+  <span class="key">"endDate"</span>: <span class="string">"2026-01-05"</span>,
+  <span class="key">"status"</span>: <span class="string">"pending"</span>,
+  <span class="key">"totalPrice"</span>: <span class="string">"450.00"</span>,  <span class="comment">// 150 × 3 ngày ✓</span>
+  <span class="key">"createdAt"</span>: <span class="string">"2026-01-01T00:00:00.000Z"</span>
+}</pre>
+                    <div class="mt-3">
+                      <div class="result-box passed">
+                        <div class="result-box-icon">✅</div>
+                        <div class="result-box-content">
+                          <div class="label">Kết quả thực tế</div>
+                          <div>Booking được tạo với <span class="response-tag">status: "pending"</span> &bull; <span class="response-tag">totalPrice: "450.00"</span> tính đúng &bull; Transaction commit thành công</div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+            </div>
+          </div>
+        </div>
+
+        <!-- ===================== TC12 ===================== -->
+        <div class="tab-pane fade" id="tc12" role="tabpanel">
+          <div class="tc-header">
+            <span class="badge bg-danger badge-module">Booking Module</span>
+            <h2 class="tc-title">TC12 &ndash; Số người vượt quá sức chứa</h2>
+            <span class="badge-passed ms-auto"><i class="bi bi-check-circle-fill"></i> PASSED</span>
+          </div>
+          <div class="tc-body">
+            <div class="accordion" id="acc12">
+
+              <div class="accordion-item">
+                <h2 class="accordion-header">
+                  <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#acc12-desc">
+                    <i class="bi bi-info-circle me-2 text-primary"></i> Mô tả
+                  </button>
+                </h2>
+                <div id="acc12-desc" class="accordion-collapse collapse show">
+                  <div class="accordion-body">
+                    <p class="mb-2">Kiểm tra hệ thống từ chối đặt phòng khi <code>capacity</code> (số người) vượt quá <code>maxPeople</code> của phòng. Thông báo lỗi phải nêu rõ giới hạn cho phép.</p>
+                    <div class="info-grid">
+                      <div class="info-item"><div class="info-label">Endpoint</div><div class="info-value">POST /booking</div></div>
+                      <div class="info-item"><div class="info-label">Module</div><div class="info-value">BookingService</div></div>
+                      <div class="info-item"><div class="info-label">Loại test</div><div class="info-value">Validation Error</div></div>
+                      <div class="info-item"><div class="info-label">HTTP Error</div><div class="info-value">400 Bad Request</div></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="accordion-item">
+                <h2 class="accordion-header">
+                  <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#acc12-input">
+                    <i class="bi bi-code-square me-2 text-warning"></i> Input / Setup
+                  </button>
+                </h2>
+                <div id="acc12-input" class="accordion-collapse collapse">
+                  <div class="accordion-body">
+                    <div class="section-label">Request Payload</div>
+                    <pre class="code-block"><span class="comment">// capacity = 5 > maxPeople = 4 ⚠️</span>
+{
+  <span class="key">"roomId"</span>: <span class="number">1</span>,
+  <span class="key">"startDate"</span>: <span class="string">"2026-01-03"</span>,
+  <span class="key">"endDate"</span>: <span class="string">"2026-01-05"</span>,
+  <span class="key">"capacity"</span>: <span class="number">5</span>  <span class="comment">// Vượt giới hạn!</span>
+}</pre>
+                    <div class="section-label mt-3">Mock Database State</div>
+                    <pre class="code-block"><span class="comment">// Phòng có sức chứa tối đa 4 người</span>
+findOne(Room) → {
+  <span class="key">id</span>: <span class="number">1</span>,
+  <span class="key">maxPeople</span>: <span class="number">4</span>,   <span class="comment">// ← giới hạn</span>
+  <span class="key">status</span>: <span class="string">"active"</span>
+}
+
+<span class="comment">// capacity (5) > maxPeople (4) → Exception</span></pre>
+                  </div>
+                </div>
+              </div>
+
+              <div class="accordion-item">
+                <h2 class="accordion-header">
+                  <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#acc12-result">
+                    <i class="bi bi-check2-all me-2 text-success"></i> Kết quả
+                  </button>
+                </h2>
+                <div id="acc12-result" class="accordion-collapse collapse">
+                  <div class="accordion-body">
+                    <div class="section-label">Expected Exception</div>
+                    <pre class="code-block"><span class="comment">// Throws BadRequestException</span>
+{
+  <span class="error-key">"statusCode"</span>: <span class="number">400</span>,
+  <span class="error-key">"error"</span>: <span class="string">"Bad Request"</span>,
+  <span class="error-key">"message"</span>: <span class="string">"No more than 4 people are allowed"</span>
+             <span class="comment">// ↑ nêu rõ giới hạn maxPeople của phòng</span>
+}</pre>
+                    <div class="mt-3">
+                      <div class="result-box error-expected">
+                        <div class="result-box-icon">✅</div>
+                        <div class="result-box-content">
+                          <div class="label">Kết quả thực tế</div>
+                          <div>Exception <span class="error-msg">BadRequestException</span> được ném đúng &bull; Message: <span class="error-msg">No more than 4 people are allowed</span> &bull; Booking không được tạo</div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+            </div>
+          </div>
+        </div>
+
+        <!-- ===================== TC13 ===================== -->
+        <div class="tab-pane fade" id="tc13" role="tabpanel">
+          <div class="tc-header">
+            <span class="badge bg-danger badge-module">Booking Module</span>
+            <h2 class="tc-title">TC13 &ndash; Đặt phòng đã có người đặt trong ngày đó</h2>
+            <span class="badge-passed ms-auto"><i class="bi bi-check-circle-fill"></i> PASSED</span>
+          </div>
+          <div class="tc-body">
+            <div class="accordion" id="acc13">
+
+              <div class="accordion-item">
+                <h2 class="accordion-header">
+                  <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#acc13-desc">
+                    <i class="bi bi-info-circle me-2 text-primary"></i> Mô tả
+                  </button>
+                </h2>
+                <div id="acc13-desc" class="accordion-collapse collapse show">
+                  <div class="accordion-body">
+                    <p class="mb-2">Kiểm tra hệ thống phát hiện và từ chối khi đặt phòng bị trùng lịch. Nếu đã có booking khác chồng lên khoảng thời gian yêu cầu, hệ thống phải trả về lỗi <code>ConflictException</code>.</p>
+                    <div class="info-grid">
+                      <div class="info-item"><div class="info-label">Endpoint</div><div class="info-value">POST /booking</div></div>
+                      <div class="info-item"><div class="info-label">Module</div><div class="info-value">BookingService</div></div>
+                      <div class="info-item"><div class="info-label">Loại test</div><div class="info-value">Conflict Error</div></div>
+                      <div class="info-item"><div class="info-label">HTTP Error</div><div class="info-value">409 Conflict</div></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="accordion-item">
+                <h2 class="accordion-header">
+                  <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#acc13-input">
+                    <i class="bi bi-code-square me-2 text-warning"></i> Input / Setup
+                  </button>
+                </h2>
+                <div id="acc13-input" class="accordion-collapse collapse">
+                  <div class="accordion-body">
+                    <div class="section-label">Request Payload</div>
+                    <pre class="code-block">{
+  <span class="key">"roomId"</span>: <span class="number">1</span>,
+  <span class="key">"startDate"</span>: <span class="string">"2026-01-03"</span>,
+  <span class="key">"endDate"</span>: <span class="string">"2026-01-05"</span>,
+  <span class="key">"capacity"</span>: <span class="number">2</span>
+}</pre>
+                    <div class="section-label mt-3">Mock Database State</div>
+                    <pre class="code-block"><span class="comment">// Phòng tồn tại và active</span>
+findOne(Room) → { <span class="key">id</span>: <span class="number">1</span>, <span class="key">status</span>: <span class="string">"active"</span>, <span class="key">maxPeople</span>: <span class="number">4</span> }
+
+<span class="comment">// ĐÃ CÓ booking trùng thời gian! ⚠️</span>
+createQueryBuilder(Booking)
+  .where(<span class="string">"roomId = :roomId"</span>)
+  .andWhere(<span class="string">"dateRange overlaps"</span>)
+  .getOne() → {
+    <span class="key">id</span>: <span class="number">100</span>,
+    <span class="key">roomId</span>: <span class="number">1</span>
+    <span class="comment">// Booking này chiếm 2026-01-03 → 2026-01-05</span>
+  }</pre>
+                  </div>
+                </div>
+              </div>
+
+              <div class="accordion-item">
+                <h2 class="accordion-header">
+                  <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#acc13-result">
+                    <i class="bi bi-check2-all me-2 text-success"></i> Kết quả
+                  </button>
+                </h2>
+                <div id="acc13-result" class="accordion-collapse collapse">
+                  <div class="accordion-body">
+                    <div class="section-label">Expected Exception</div>
+                    <pre class="code-block"><span class="comment">// Throws ConflictException (409)</span>
+{
+  <span class="error-key">"statusCode"</span>: <span class="number">409</span>,
+  <span class="error-key">"error"</span>: <span class="string">"Conflict"</span>,
+  <span class="error-key">"message"</span>: <span class="string">"This room has already been booked during this time period"</span>
+}</pre>
+                    <div class="mt-3">
+                      <div class="result-box error-expected">
+                        <div class="result-box-icon">✅</div>
+                        <div class="result-box-content">
+                          <div class="label">Kết quả thực tế</div>
+                          <div>Exception <span class="error-msg">ConflictException</span> được ném đúng &bull; Message: <span class="error-msg">This room has already been booked during this time period</span> &bull; Booking mới không được tạo</div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+            </div>
+          </div>
+        </div>
+
+      </div><!-- /tab-content -->
+    </div><!-- /tab-content-wrap -->
+
+    <!-- Footer -->
+    <div class="text-center text-muted mt-4" style="font-size: 0.8rem;">
+      Resort Booking System &mdash; API Unit Tests &mdash; NestJS + TypeORM + Jest
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
