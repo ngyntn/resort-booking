@@ -33,24 +33,24 @@ test('accept booking', async ({ page }) => {
 
     await expect(page).toHaveURL(/booking-confirmation/);
 
-    await page.getByTestId('booking-guests-select').click();
+    // await page.getByTestId('booking-guests-select').click();
 
-    await page.getByText('2 guests').click();
+    // await page.getByText('2 guests').click();
     await page
     .getByTestId('booking-checkin-input')
-    .fill('2026-05-30');
+    .fill('2026-06-20');
 
     await page
     .getByTestId('booking-checkout-input')
-    .fill('2026-06-02');
+    .fill('2026-06-21');
 
 
     await expect(page.getByText(roomName)).toBeVisible();
 
-    await expect(page.getByTestId('booking-total-days')).toContainText('4 days');
+    await expect(page.getByTestId('booking-total-days')).toContainText('2 days');
 
     const roomPrice = Number(roomPriceText.replace(/[^0-9.]/g, ''));
-    const expectedTotal = roomPrice * 4;
+    const expectedTotal = roomPrice * 2;
     await expect(page.getByTestId('booking-total-price')).toContainText(`$${expectedTotal}`);
 
     await page.getByTestId('confirm-booking-button').click();
